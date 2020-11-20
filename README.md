@@ -23,6 +23,8 @@ _Please be careful to not re-distribute code that has your password or token!_
 * Parameter based API calls 
 * Better user interface
 
+## Acknowledgements
+Props Jason Kaplan for the original code snippets & inspiration to make it better
 
 ## Contact
 Caleb Cohen  
