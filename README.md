@@ -7,7 +7,12 @@ Full documentation may be found at https://tesla-api.timdorr.com/vehicle/command
 
 ## Usage
 ```bash
-python tesla.py
+python main.py
+```
+
+## Requirements
+```
+pip install response readchar
 ```
 
 ## Authentication
@@ -17,11 +22,26 @@ python tesla.py
 
 _Please be careful to not re-distribute code that has your password or token!_ 
 
+## Release Notes
+###2020-11-20
+  * Updated menu system with more granularity (still need an even better one)
+  * Parameterized commands now run!
+  * Help text to explain parameters shown before entry
+  * More robust error handling
+  
+###Initial
+  * Simple menu to run a number of no-input-required commands via the Tesla API
+  * Only GET/POST which do not require input will run
+
 ## ToDo List
+* ~~Better user interface~~
+* ~~Parameter based API calls~~
+* Finish testing/coding "soon" items
+* Bug waking up the first time (rerun works)
 * Interactive authentication
 * After token, message user to set as env var for future use
-* Parameter based API calls 
-* Better user interface
+* Convert Celsius to Fahrenheit
+* Betterer user interface
 
 ## Acknowledgements
 Props Jason Kaplan for the original code snippets & inspiration to make it better

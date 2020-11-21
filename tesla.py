@@ -1,9 +1,3 @@
-#!/usr/bin/python
-
-# https://tesla-api.timdorr.com/api-basics/authentication
-# https://www.teslaapi.io/authentication/oauth
-# http://docs.python-requests.org/en/master/user/quickstart/
-
 import requests
 import json
 import pprint
@@ -25,8 +19,8 @@ class TeslaAPI:
         self.client_id = "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384"
         self.client_secret = "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
 
-        self.get = 'GET'
-        self.post = 'POST'
+        self.get = 'get'
+        self.post = 'post'
 
         self.base_url = "https://owner-api.teslamotors.com/"
         self.base_api = "api/1/vehicles/"
@@ -89,77 +83,60 @@ class TeslaAPI:
             self.set_headers(environ.get('TESLA_API_TOKEN'))
             return environ.get('TESLA_API_TOKEN')
         else:
-            payload = {'grant_type': 'password', 'client_id': self.client_id, 'client_secret': self.client_secret,
-                       'email': self.email, 'password': self.password}
-            api_response = requests.post(self.base_url + "oauth/token", data=payload)
-            response_json = json.loads(api_response.text)
-            self.set_headers(response_json["access_token"])
+            if 'your' in self.email or 'your' in self.password:
+                print(
+                    'You must set email & password or provide token in order for this to work.  Please see the Readme file for more information.')
+                return False
+            else:
+                payload = {'grant_type': 'password', 'client_id': self.client_id, 'client_secret': self.client_secret,
+                           'email': self.email, 'password': self.password}
+                api_response = requests.post(self.base_url + "oauth/token", data=payload)
+                response_json = json.loads(api_response.text)
+                self.set_headers(response_json["access_token"])
+                return response_json["access_token"]
 
-            pp.pprint(api_response)
-            return response_json["access_token"]
-
-    def api_call(self, method, endpoint=''):
-        print('\nMaking Tesla API call to ' + endpoint)
+    def api_call(self, method, endpoint='', payload=''):
+        url = self.base_url + self.base_api + self.vehicle_id + endpoint
+        print(f'\nMaking Tesla API call. Method: {method} URL: {url}\n')
         if method == self.get:
-            api_response = requests.get(self.base_url + self.base_api + self.vehicle_id + endpoint,
-                                        headers=self.headers)
+            api_response = requests.get(url, headers=self.headers)
         elif method == self.post:
-            api_response = requests.post(self.base_url + self.base_api + self.vehicle_id + endpoint,
-                                         headers=self.headers)
+            api_response = requests.post(url, headers=self.headers, data=payload)
         else:
             return False
 
-        response_json = json.loads(api_response.text)
-        return response_json
-
-    def set_vehicle_id(self):
-        api_response = self.api_call(self.get)
-        self.vehicle_id = str(api_response["response"][0]["id"])
-
-        print(f'Your vehicle ID: {self.vehicle_id}\n')
-        pp.pprint(api_response)
-
-        return api_response['response'][0]['state']
-
-    def get_vehicle_data(self):
-        return self.api_call(self.get, '/vehicle_data')
-
-    def print_menu(self):
-        print(self.menu)
-
-    def run_command(self):
-        selection = input("Enter your command #:")
-        selection = int(selection)
-
-        if selection == 99:
-            print('Goodbye')
-            return True
-        elif selection < len(self.menu_items):
-            function_name, method, endpoint = self.menu_items[selection]
-            result = self.api_call(method, endpoint)
-            pp.pprint(result)
-        else:
-            print('Invalid option, pls try again, 99 to exit')
+        if api_response.text:
+            return json.loads(api_response.text)
 
         return False
 
+    def set_vehicle_id(self):
+        api_response = self.api_call(self.get)
+        if api_response:
+            self.vehicle_id = str(api_response["response"][0]["id"])
+            return api_response['response'][0]['state']
+        return False
 
-tesla = TeslaAPI()
-api_token = tesla.get_access_token()
-vehicle_state = tesla.set_vehicle_id()
+    def run_command(self, method, endpoint, payload=''):
+        result = self.api_call(method, endpoint, payload)
+        pp.pprint(result)
 
-if vehicle_state != 'online':
-    print('Your vehicle state is ' + vehicle_state + '\nAttempting to wake it up')
-    response = tesla.api_call(tesla.post, '/wake_up')
-    vehicle_state = tesla.set_vehicle_id()
-    if vehicle_state != 'online':
-        print(
-            'Unable to wake up vehicle. Please use the app or try opening the doors or putting it into drive then back into park.')
+    def initiate_communications(self):
+        if not self.get_access_token():
+            exit()
 
-if vehicle_state == 'online':
-    pp.pprint(tesla.get_vehicle_data())
+        vehicle_state = self.set_vehicle_id()
 
-done = False
-while not done:
-    tesla.print_menu()
-    done = tesla.run_command()
+        if vehicle_state != 'online':
+            print(f'Your vehicle state is {vehicle_state}\nAttempting to wake it up')
+            response = self.api_call(self.post, '/wake_up')
+            vehicle_state = self.set_vehicle_id()
+            if not vehicle_state and vehicle_state != 'online':
+                print(
+                    'Unable to wake up vehicle. Please use the app or try opening the doors or putting it into drive then back into park.')
+                return False
+
+        if vehicle_state == 'online':
+            return True
+
+        return False
