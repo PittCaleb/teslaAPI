@@ -19,12 +19,18 @@ pip install response readchar
 1. Edit code and add email and tesla.com password to the file
 2. Edit code and add known token to the file
 3. Add environment variable TESLA_API_TOKEN to your system
-
+  * Windows:
+    * SET TESLA_API_TOKEN=YOUR-TOKEN-HERE
+    
 _Please be careful to not re-distribute code that has your password or token!_ 
 
 ## Release Notes
 
 ###2020-11-20
+  * Finish coding all API endpoints, couple do not work, but coded properly
+  * Move menu definition to a data helper file for cleanliness
+  * Add disclaimer on launch
+  * Sleep after wake_up to allow it to finish
   * Updated menu system with more granularity (still need an even better one)
   * Parameterized commands now run!
   * Help text to explain parameters shown before entry
@@ -37,12 +43,15 @@ _Please be careful to not re-distribute code that has your password or token!_
 ## ToDo List
 * ~~Better user interface~~
 * ~~Parameter based API calls~~
-* Finish testing/coding "soon" items
-* Bug waking up the first time (rerun works)
+* ~~Finish testing/coding "soon" items~~
+* ~~Bug waking up the first time~~
 * Interactive authentication
 * After token, message user to set as env var for future use
-* Convert Celsius to Fahrenheit
 * Betterer user interface
+* Send (share) address to car
+* Summary screen with important info before main menu
+* Auto-populate locked parameters
+* Convert Celsius to Fahrenheit
 
 ## Acknowledgements
 Props Jason Kaplan for the original code snippets & inspiration to make it better

@@ -1,3 +1,4 @@
+import time
 import requests
 import json
 import pprint
@@ -26,48 +27,6 @@ class TeslaAPI:
         self.base_api = "api/1/vehicles/"
         self.headers = None
         self.vehicle_id = ''
-
-        self.remove = ['__init__', 'set_headers', 'get_access_token', 'api_call', 'set_vehicle_id']
-
-        self.menu = """
-    Statuses                        Commands                        Coming Soon
-    --------                        --------                        -----------
-    1 - get vehicle data            10 - wake up                    30 - remote start
-    2 - get charge state            11 - honk horn                  31 - trigger homelink
-    3 - get climate state           12 - flash lights               32 - speed limit (4)
-    4 - get drive state             13 - door unlock                33 - valet mode (2)
-    5 - get gui settings            14 - door lock                  34 - sentry mode
-    6 - get vehicle state           15 - open charge port           35 - trunk control
-    7 - get vehicle config          16 - close charge port          36 - window control
-    8 - get mobile enabled          17 - start charging             37 - sun roof control
-    9 - get nearby chargers         18 - stop charging              38 - charge limit set
-                                    19 - set charge standard        39 - set temps (4)
-                                    20 - set charge max             40 - media (7 endpoints)
-                                    21 - conditioning start         41 - sharing
-    99 - EXIT                       22 - conditioning stop          42 -software update (2)
-            """
-
-        self.menu_items = {1: ['get_vehicle_data', self.get, '/vehicle_data'],
-                           2: ['get_charge_state', self.get, '/data_request/charge_state'],
-                           3: ['get_climate_state', self.get, '/data_request/climate_state'],
-                           4: ['get_drive_state', self.get, '/data_request/drive_state'],
-                           5: ['get_gui_settings', self.get, '/data_request/gui_settings'],
-                           6: ['get_vehicle_state', self.get, '/data_request/vehicle_state'],
-                           7: ['get_vehicle_config', self.get, '/data_request/vehicle_config'],
-                           8: ['get_mobile_enabled', self.get, '/mobile_enabled'],
-                           9: ['get_nearby_chargers', self.get, '/nearby_charging_sites'],
-                           10: ['wake_up', self.post, '/wake_up'], 11: ['honk_horn', self.post, '/command/honk_horn'],
-                           12: ['flash_lights', self.post, '/command/flash_lights'],
-                           13: ['door_unlock', self.post, '/command/door_unlock'],
-                           14: ['door_lock', self.post, '/command/door_lock'],
-                           15: ['open_charge_port', self.post, '/command/charge_port_door_open'],
-                           16: ['close_charge_port', self.post, '/command/charge_port_door_close'],
-                           17: ['start_charging', self.post, '/command/charge_start'],
-                           18: ['stop_charging', self.post, '/command/charge_stop'],
-                           19: ['set_charge_standard', self.post, '/command/charge_standard'],
-                           20: ['set_charge_max', self.post, '/command/charge_max_range'],
-                           21: ['conditioning_start', self.post, '/command/auto_conditioning_start'],
-                           22: ['conditioning_stop', self.post, '/command/auto_conditioning_stop']}
 
     def set_headers(self, access_token):
         self.headers = {'Authorization': 'Bearer ' + access_token + ''}
@@ -130,6 +89,7 @@ class TeslaAPI:
         if vehicle_state != 'online':
             print(f'Your vehicle state is {vehicle_state}\nAttempting to wake it up')
             response = self.api_call(self.post, '/wake_up')
+            time.sleep(7)
             vehicle_state = self.set_vehicle_id()
             if not vehicle_state and vehicle_state != 'online':
                 print(
