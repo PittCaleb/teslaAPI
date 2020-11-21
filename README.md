@@ -23,6 +23,7 @@ pip install response readchar
 _Please be careful to not re-distribute code that has your password or token!_ 
 
 ## Release Notes
+
 ###2020-11-20
   * Updated menu system with more granularity (still need an even better one)
   * Parameterized commands now run!
