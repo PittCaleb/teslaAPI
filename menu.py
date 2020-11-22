@@ -59,8 +59,7 @@ class Menu:
 
                 self.tesla.run_command(commands[key_press][0], commands[key_press][1], payload)
         elif key_press == 'e':
-            if not self.prev_menu:
-                exit()
+            exit()
         elif key_press == 'b':
             return True
         else:
